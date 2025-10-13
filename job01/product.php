@@ -4,18 +4,16 @@
 // Elle permet de représenter un produit dans une boutique (ex : t-shirt, téléphone, etc.)
 class Product
 {
-    // --- 🔒 Propriétés privées ---
-    // Elles ne sont accessibles que depuis l'intérieur de la classe
-    private int $id;                 // Identifiant unique du produit
-    private string $name;            // Nom du produit
-    private array $photos;           // Tableau contenant les URLs ou noms des images
-    private int $price;              // Prix du produit (en centimes ou en euros)
-    private string $description;     // Description du produit
-    private int $quantity;           // Quantité en stock
-    private DateTime $createdAt;     // Date de création du produit
-    private DateTime $updatedAt;     // Date de dernière mise à jour du produit
+    
+    private int $id;                
+    private string $name;           
+    private array $photos;          
+    private int $price;              
+    private string $description;     
+    private int $quantity;          
+    private DateTime $createdAt;     
+    private DateTime $updatedAt;     
 
-    // --- 🧩 Constructeur ---
     // Il est appelé automatiquement quand on crée un nouvel objet Product
     // Il sert à initialiser toutes les propriétés de la classe
     public function __construct(
@@ -39,7 +37,7 @@ class Product
         $this->updatedAt = $updatedAt;
     }
 
-    // --- 📤 Getters ---
+    // ---  Getters ---
     // Ces méthodes permettent d’accéder aux propriétés privées depuis l’extérieur
     public function getId(): int { return $this->id; }
     public function getName(): string { return $this->name; }
@@ -50,7 +48,7 @@ class Product
     public function getCreatedAt(): DateTime { return $this->createdAt; }
     public function getUpdatedAt(): DateTime { return $this->updatedAt; }
 
-    // --- ✏️ Setters ---
+    // ---  Setters ---
     // Ces méthodes permettent de modifier les propriétés privées depuis l’extérieur
     public function setId(int $id): void { $this->id = $id; }
     public function setName(string $name): void { $this->name = $name; }
