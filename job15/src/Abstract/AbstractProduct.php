@@ -32,6 +32,17 @@ abstract class AbstractProduct
 
     public function setQuantity(int $quantity): self { $this->quantity = $quantity; return $this; }
 
+    /**
+     * Hydrate les propriétés communes depuis un tableau associatif (row DB)
+     */
+    protected function hydrate(array $row): void
+    {
+        if (isset($row['id'])) $this->id = (int)$row['id'];
+        if (isset($row['name'])) $this->name = (string)$row['name'];
+        if (isset($row['quantity'])) $this->quantity = (int)$row['quantity'];
+        if (isset($row['price'])) $this->price = (int)$row['price'];
+    }
+
     // Méthodes abstraites à implémenter dans les classes enfants
     abstract public static function findOneById(int $id): self|false;
     abstract public static function findAll(): array;
