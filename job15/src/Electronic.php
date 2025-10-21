@@ -79,6 +79,65 @@ class Electronic extends AbstractProduct implements StockableInterface
         ];
     }
 
-    public function create(): self|false { return $this; }
-    public function update(): bool { return true; }
+    public function create(): self|false { 
+            // Ici tu mettrais le code pour créer en DB
+                    $pdo = Database::getPdo();
+                    if (!$pdo) return false;
+
+                    try {
+                        $pdo->beginTransaction();
+
+                        $stmt = $pdo->prepare('INSERT INTO product (name, quantity, price, photos) VALUES (:name, :quantity, :price, :photos)');
+                        $stmt->execute([
+                            'name' => $this->name,
+                            'quantity' => $this->quantity,
+                            'price' => $this->price,
+                            'photos' => '',
+                        ]);
+
+                        $this->id = (int)$pdo->lastInsertId();
+
+                        $stmt2 = $pdo->prepare('INSERT INTO electronic (product_id, brand) VALUES (:product_id, :brand)');
+                        $stmt2->execute([
+                            'product_id' => $this->id,
+                            'brand' => $this->brand,
+                        ]);
+
+                        $pdo->commit();
+                        return $this;
+                    } catch (\Exception $e) {
+                        if ($pdo->inTransaction()) $pdo->rollBack();
+                        return false;
+                    }
+     }
+    public function update(): bool { 
+        // Ici tu mettrais le code pour mettre à jour en DB
+            if (!$this->id) return false;
+            $pdo = Database::getPdo();
+            if (!$pdo) return false;
+
+            try {
+                $pdo->beginTransaction();
+
+                $stmt = $pdo->prepare('UPDATE product SET name = :name, quantity = :quantity, price = :price WHERE id = :id');
+                $stmt->execute([
+                    'name' => $this->name,
+                    'quantity' => $this->quantity,
+                    'price' => $this->price,
+                    'id' => $this->id,
+                ]);
+
+                $stmt2 = $pdo->prepare('UPDATE electronic SET brand = :brand WHERE product_id = :id');
+                $stmt2->execute([
+                    'brand' => $this->brand,
+                    'id' => $this->id,
+                ]);
+
+                $pdo->commit();
+                return true;
+            } catch (\Exception $e) {
+                if ($pdo->inTransaction()) $pdo->rollBack();
+                return false;
+            }
+     }
 }

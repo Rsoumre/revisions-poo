@@ -90,14 +90,71 @@ class Clothing extends AbstractProduct implements StockableInterface
     }
 
     public function create(): self|false
-    {
-        // Ici tu mettrais le code pour créer en DB
+{
+    $pdo = Database::getPdo();
+    if (!$pdo) return false;
+
+    try {
+        $pdo->beginTransaction();
+
+        // Insert into product (photos optional)
+        $stmt = $pdo->prepare('INSERT INTO product (name, quantity, price, photos) VALUES (:name, :quantity, :price, :photos)');
+        $stmt->execute([
+            'name' => $this->name,
+            'quantity' => $this->quantity,
+            'price' => $this->price,
+            'photos' => '',
+        ]);
+
+        $this->id = (int)$pdo->lastInsertId();
+
+        // Insert into clothing
+        $stmt2 = $pdo->prepare('INSERT INTO clothing (product_id, size, color) VALUES (:product_id, :size, :color)');
+        $stmt2->execute([
+            'product_id' => $this->id,
+            'size' => $this->size,
+            'color' => $this->color,
+        ]);
+
+        $pdo->commit();
         return $this;
+    } catch (\Exception $e) {
+        if ($pdo->inTransaction()) $pdo->rollBack();
+        return false;
     }
+}
+
 
     public function update(): bool
-    {
-        // Ici tu mettrais le code pour mettre à jour en DB
-        return true;
+{
+        if (!$this->id) return false;
+        $pdo = Database::getPdo();
+        if (!$pdo) return false;
+
+        try {
+            $pdo->beginTransaction();
+
+            $stmt = $pdo->prepare('UPDATE product SET name = :name, quantity = :quantity, price = :price WHERE id = :id');
+            $stmt->execute([
+                'name' => $this->name,
+                'quantity' => $this->quantity,
+                'price' => $this->price,
+                'id' => $this->id,
+            ]);
+
+            $stmt2 = $pdo->prepare('UPDATE clothing SET size = :size, color = :color WHERE product_id = :id');
+            $stmt2->execute([
+                'size' => $this->size,
+                'color' => $this->color,
+                'id' => $this->id,
+            ]);
+
+            $pdo->commit();
+            return true;
+        } catch (\Exception $e) {
+            if ($pdo->inTransaction()) $pdo->rollBack();
+            return false;
+        }
     }
+
 }
